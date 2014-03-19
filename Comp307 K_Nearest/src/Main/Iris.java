@@ -1,10 +1,15 @@
 package Main;
+
+import java.util.ArrayList;
+
 public class Iris {
 
 	private double sepalLength;
 	private double sepalWidth;
 	private double petalLength;
 	private double petalWidth;
+	
+	private ArrayList<Double> data;
 	
 	private String type;
 
@@ -16,6 +21,12 @@ public class Iris {
 		this.petalLength = petalLength;
 		this.petalWidth = petalWidth;
 		this.type = type;
+		
+		this.data = new ArrayList<Double>();
+		this.data.add(sepalLength);
+		this.data.add(sepalWidth);
+		this.data.add(petalLength);
+		this.data.add(petalWidth);
 	}
 
 	public double getSepalLength() {
@@ -36,6 +47,10 @@ public class Iris {
 
 	public String getType() {
 		return type;
+	}
+	
+	public ArrayList<Double> getData(){
+		return this.data;
 	}
 	
 	public String toString(){

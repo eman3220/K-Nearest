@@ -1,4 +1,5 @@
 package Main;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,9 +9,10 @@ import java.util.ArrayList;
 
 public class Classifier {
 
-	private ArrayList<Iris> training;
+	private ArrayList<Iris> trainingSet;
 
 	public Classifier(File file) {
+		this.trainingSet = new ArrayList<Iris>();
 		readFile(file);
 	}
 
@@ -21,9 +23,12 @@ public class Classifier {
 			while ((line = br.readLine()) != null) {
 				parseLine(line);
 			}
-		} catch (Exception e) {
+		} catch (FileNotFoundException e) {
 			System.err.println("Failed to read training file");
 			System.exit(0);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -34,16 +39,36 @@ public class Classifier {
 	 */
 	private void parseLine(String line) {
 		String[] s = line.split("  ");
+		if (s.length != 5) {
+			System.err.println("Line is not parsable... skipping line...");
+			return;
+		}
 		Iris i = new Iris(Double.parseDouble(s[0]), Double.parseDouble(s[1]),
 				Double.parseDouble(s[2]), Double.parseDouble(s[3]), s[4]);
-		this.training.add(i);
+		this.trainingSet.add(i);
 	}
-	
-	public String classify(Iris i){
+
+	public String classify(Iris testIris) {
 		String type = "";
-		
-		
-		
+
+		for (Iris trainingIris : this.trainingSet) {
+			// get distance from each iris in training set
+			double d = calculateDistance(trainingIris, testIris);
+			System.out.println(d);
+		}
 		return type;
+	}
+
+	private double calculateDistance(Iris trainingIris, Iris testIris) {
+		double sumOf = 0;
+		for (int i = 0; i < 4; i++) {
+			double a = trainingIris.getData().get(i);
+			double b = testIris.getData().get(i);
+			double r = i+1;
+			double numerator = Math.pow((a-b), 2);
+			double denominator = Math.pow(r, 2);
+			sumOf = sumOf + (numerator/denominator);
+		}
+		return Math.sqrt(sumOf);
 	}
 }

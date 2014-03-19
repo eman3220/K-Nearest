@@ -3,6 +3,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.sound.midi.SysexMessage;
@@ -26,6 +27,10 @@ public class Main {
 			System.exit(0);
 		}
 		
+		// remove these later
+		//this.training = new File("part1/iris-training.txt");
+		//this.test = new File("part1/iris-test.txt");
+		
 		this.irisClassifier = new Classifier(this.training);
 		
 		readTestData();
@@ -43,15 +48,24 @@ public class Main {
 			String line;
 			while((line=br.readLine())!=null){
 				Iris i = parseLine(line);
-				this.testData.add(i);
+				if(i!=null){
+					this.testData.add(i);
+				}
 			}
-		} catch (Exception e) {
+		} catch (FileNotFoundException e) {
 			System.err.println("Failed reading Test file");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
 	private Iris parseLine(String line) {
 		String[] s = line.split("  ");
+		if (s.length != 5) {
+			System.err.println("Line is not parsable... skipping line...");
+			return null;
+		}
 		Iris i = new Iris(Double.parseDouble(s[0]), Double.parseDouble(s[1]),
 				Double.parseDouble(s[2]), Double.parseDouble(s[3]), s[4]);
 		return i;
