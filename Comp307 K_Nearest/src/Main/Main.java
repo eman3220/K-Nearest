@@ -35,9 +35,21 @@ public class Main {
 		
 		readTestData();
 		
+		float correct = 0f;
+		float total = 0f;
+		
 		for(Iris i : this.testData){
-			this.irisClassifier.classify(i);
+			String s = this.irisClassifier.classify(i);
+			System.out.println(i.getType()+" - Classified as "+s);
+			if(s.equals(i.getType())){
+				correct++;
+			}
+			total++;
 		}
+		System.out.println("-------");
+		System.out.println(correct+"/"+total);
+		
+		// end
 	}
 
 	private void readTestData() {
