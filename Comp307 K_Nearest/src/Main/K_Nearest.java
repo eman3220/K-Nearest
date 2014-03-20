@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import javax.sound.midi.SysexMessage;
 import javax.swing.JOptionPane;
 
-public class Main {
+public class K_Nearest {
 
 	private File training;
 	private File test;
@@ -18,7 +18,7 @@ public class Main {
 	
 	private ArrayList<Iris> testData;
 
-	public Main(String training, String test) {
+	public K_Nearest(String training, String test) {
 		try {
 			this.training = new File(training);
 			this.test = new File(test);
@@ -75,7 +75,7 @@ public class Main {
 	private Iris parseLine(String line) {
 		String[] s = line.split("  ");
 		if (s.length != 5) {
-			System.err.println("Line is not parsable... skipping line...");
+			//System.err.println("Line is not parsable... skipping line...");
 			return null;
 		}
 		Iris i = new Iris(Double.parseDouble(s[0]), Double.parseDouble(s[1]),
@@ -92,6 +92,6 @@ public class Main {
 		}
 		String s1 = args[0];
 		String s2 = args[1];
-		new Main(s1, s2);
+		new K_Nearest(s1, s2);
 	}
 }

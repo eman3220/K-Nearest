@@ -11,11 +11,42 @@ import java.util.PriorityQueue;
 public class Classifier {
 
 	private ArrayList<Iris> trainingSet;
-	private int k = 1;
+	private int k = 3;
+
+	private double maxSL = 0;
+	private double minSL = Double.MAX_VALUE;
+
+	private double maxSW = 0;
+	private double minSW = Double.MAX_VALUE;
+
+	private double maxPL = 0;
+	private double minPL = Double.MAX_VALUE;
+
+	private double maxPW = 0;
+	private double minPW = Double.MAX_VALUE;
+
+	private double[] ranges = new double[4];
 
 	public Classifier(File file) {
 		this.trainingSet = new ArrayList<Iris>();
 		readFile(file);
+		
+		// we have max and mins, work out range
+		double slRange = maxSL - minSL;
+		double swRange = maxSW - minSW;
+		double plRange = maxPL - minPL;
+		double pwRange = maxPW - minPW;
+		
+		ranges[0] = slRange;
+		ranges[1] = swRange;
+		ranges[2] = plRange;
+		ranges[3] = pwRange;
+		
+		System.out.println("Sepal Length Range: "+ranges[0]);
+		System.out.println("Sepal Width Range: "+ranges[1]);
+		System.out.println("Petal Length Range: "+ranges[2]);
+		System.out.println("Petal Width Range: "+ranges[3]);
+		System.out.println("K = "+k);
 	}
 
 	private void readFile(File file) {
@@ -42,19 +73,61 @@ public class Classifier {
 	private void parseLine(String line) {
 		String[] s = line.split("  ");
 		if (s.length != 5) {
-			System.err.println("Line is not parsable... skipping line...");
+			//System.err.println("Line is not parsable... skipping line...");
 			return;
 		}
-		Iris i = new Iris(Double.parseDouble(s[0]), Double.parseDouble(s[1]),
-				Double.parseDouble(s[2]), Double.parseDouble(s[3]), s[4]);
+		double sl = Double.parseDouble(s[0]);
+		double sw = Double.parseDouble(s[1]);
+		double pl = Double.parseDouble(s[2]);
+		double pw = Double.parseDouble(s[3]);
+		
+		checkSepalRange(sl,sw);
+		checkPetalRange(pl,pw);
+		
+		Iris i = new Iris(sl, sw, pl, pw, s[4]);
 		this.trainingSet.add(i);
 	}
 
+	private void checkSepalRange(double sl, double sw) {
+		if(sl>this.maxSL){
+			this.maxSL = sl;
+		}
+		if(sl<this.minSL){
+			this.minSL = sl;
+		}
+		
+		if(sw>this.maxSW){
+			this.maxSW = sw;
+		}
+		if(sw<this.minSW){
+			this.minSW = sw;
+		}
+	}
+	
+	private void checkPetalRange(double pl, double pw) {
+		if(pl>this.maxPL){
+			this.maxPL = pl;
+		}
+		if(pl<this.minPL){
+			this.minPL = pl;
+		}
+		
+		if(pw>this.maxPW){
+			this.maxPW = pw;
+		}
+		if(pw<this.minPW){
+			this.minPW = pw;
+		}
+	}
+
+	/**
+	 * Use priority queue to order training irises by distance from test iris
+	 * Poll from priority queue "k" times
+	 * 
+	 * @param testIris
+	 * @return
+	 */
 	public String classify(Iris testIris) {
-		String type = "";
-		double d = Double.MAX_VALUE;
-		// double d = calculateDistance(this.trainingSet.get(0), testIris);
-		// System.out.println(d);
 		PriorityQueue<IrisDistance> pq = new PriorityQueue<IrisDistance>(75,
 				new DistanceComparator());
 
@@ -65,12 +138,11 @@ public class Classifier {
 			// add to the priority queue, sorts the distance by small to large
 			pq.add(new IrisDistance(distance, trainingIris));
 		}
-		
-		//System.out.println("---");
+
 		int setosa = 0;
 		int versicolor = 0;
 		int virginica = 0;
-		for(int i=0;i<k;i++){
+		for (int i = 0; i < k; i++) {
 			Iris iris = pq.poll().getIris();
 			switch (iris.getType()) {
 			case "Iris-setosa":
@@ -100,7 +172,7 @@ public class Classifier {
 		for (int i = 0; i < 4; i++) {
 			double a = trainingIris.getData().get(i);
 			double b = testIris.getData().get(i);
-			double r = i + 1;
+			double r = this.ranges[i];
 			double numerator = Math.pow((a - b), 2);
 			double denominator = Math.pow(r, 2);
 			sumOf = sumOf + (numerator / denominator);
