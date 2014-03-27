@@ -1,4 +1,4 @@
-package Main;
+package nearest;
 
 public class IrisDistance {
 

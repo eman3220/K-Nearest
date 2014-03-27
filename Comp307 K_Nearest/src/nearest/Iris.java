@@ -1,4 +1,4 @@
-package Main;
+package nearest;
 
 import java.util.ArrayList;
 
