@@ -26,6 +26,8 @@ public class DecisionTree1 {
 	private ArrayList<Instance> instances;
 
 	private Node root;
+	
+	private String majorityClass;
 
 	public DecisionTree1(String[] args) {
 		this.trainingFile = new File(args[0]);
@@ -36,6 +38,9 @@ public class DecisionTree1 {
 		this.instances = new ArrayList<Instance>();
 
 		readTraining();
+		
+		// find majority class
+		findMajorityClass();
 
 		beginBuildTree();
 
@@ -44,6 +49,23 @@ public class DecisionTree1 {
 		System.out.println("\n\n===== BUILDING TREE =====\n\n");
 		this.root.printNode("");
 		System.out.println("\n\n===== FINISHED TREE =====\n\n");
+	}
+
+	private void findMajorityClass() {
+		int liveCount = 0;
+		int dieCount = 0;
+		for(Instance i : this.instances){
+			if(i.getClassType().equals("live")){
+				liveCount++;
+			}else{
+				dieCount++;
+			}
+		}
+		if(liveCount<dieCount){
+			this.majorityClass = "die";
+		}else{
+			this.majorityClass = "live";
+		}
 	}
 
 	private void readTest() {
@@ -107,6 +129,26 @@ public class DecisionTree1 {
 		
 		System.out.println("live: "+liveCorrect+" correct out of "+liveTotal);
 		System.out.println("die: "+dieCorrect+" correct out of "+dieTotal);
+		
+		int correct = liveCorrect+dieCorrect;
+		int total = liveTotal+dieTotal;
+		float accuracy = ((float)correct / total) * 100;
+		System.out.println("\nAccuracy:");
+		System.out.println("Decision Tree Accuracy: "+accuracy+"%");
+		
+		// find baseline accuracy
+		//this.majorityClass;
+		int baseLineCorrect = 0;
+		int baseLineTotal = 0;
+		
+		for(Instance inst : this.instances){
+			if(inst.getClassType().equals(this.majorityClass)){
+				baseLineCorrect++;
+			}
+			baseLineTotal++;
+		}
+		float baselineAccuracy = ((float)baseLineCorrect/baseLineTotal) * 100;
+		System.out.println("Baseline Accuracy ("+this.majorityClass+") : "+baselineAccuracy+"%");
 	}
 
 	private void parseInstance(String line, ArrayList<Instance> testInstances) {
